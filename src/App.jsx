@@ -15,12 +15,12 @@ function App() {
   const [goal, setGoal] = useState(1000)
 
   const fetchAPI = async () => {
-    const response = await axios.get("http://localhost:5000/api/fetch_stuffies");
+    const response = await axios.get("https://crocheted-money-production.up.railway.app/api/fetch_stuffies");
     setList(response.data)
   };
 
   const fetchGoal = async () => {
-    const response = await axios.get("http://localhost:5000/api/fetch_goal_data")
+    const response = await axios.get("https://crocheted-money-production.up.railway.app/api/fetch_goal_data")
     setGoal(response.data.target_goal)
     setTotal(response.data.target_progress)
     console.log(response.data.target_goal, response.data.target_progress)
@@ -57,7 +57,7 @@ function App() {
     // Id is automatically set by the DB
     try{
     // Send a post request to the add_new_stuffies endpoint
-      const response = await axios.post('http://localhost:5000/api/add_new_stuffy', {StuffyName: name, Price: parseFloat(price)});
+      const response = await axios.post('https://crocheted-money-production.up.railway.app/api/add_new_stuffy', {StuffyName: name, Price: parseFloat(price)});
       console.log(response)
       //Reload the quick add list
       fetchAPI()
@@ -74,7 +74,7 @@ function App() {
     try{
       const newTotal = total + amount
       setTotal(newTotal)
-      const response = await axios.patch('http://localhost:5000/api/set_target_progress', {target_progress: newTotal})
+      const response = await axios.patch('https://crocheted-money-production.up.railway.app/api/set_target_progress', {target_progress: newTotal})
       console.log(response)
     }
     catch(error){
