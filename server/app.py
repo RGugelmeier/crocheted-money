@@ -8,7 +8,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, origins="*", methods=["GET", "POST", "PATCH", "OPTIONS"], allow_headers=["Content-Type"])
+
+# CORS configuration for production
+CORS(app, 
+     origins=["https://crocheted-money.vercel.app", "http://localhost:5173"],
+     methods=["GET", "POST", "PATCH", "OPTIONS"],
+     allow_headers=["Content-Type"],
+     supports_credentials=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)
@@ -92,4 +98,5 @@ def set_target_progress():
 
 if __name__ == '__main__':
     create_db()
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
