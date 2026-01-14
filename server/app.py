@@ -8,13 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={
-    r"/api/*": {
-        "origins": ["https://crocheted-money.vercel.app", "http://localhost:5173"],
-        "methods": ["GET", "POST", "PATCH", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+CORS(app, origins="*", methods=["GET", "POST", "PATCH", "OPTIONS"], allow_headers=["Content-Type"])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)

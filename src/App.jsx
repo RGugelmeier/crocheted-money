@@ -15,15 +15,25 @@ function App() {
   const [goal, setGoal] = useState(1000)
 
   const fetchAPI = async () => {
-    const response = await axios.get("https://crocheted-money-production.up.railway.app/api/fetch_stuffies");
-    setList(response.data)
+    try {
+      const response = await axios.get("https://crocheted-money-production.up.railway.app/api/fetch_stuffies");
+      console.log("API response:", response.data);
+      setList(response.data || [])
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setList([])
+    }
   };
 
   const fetchGoal = async () => {
-    const response = await axios.get("https://crocheted-money-production.up.railway.app/api/fetch_goal_data")
-    setGoal(response.data.target_goal)
-    setTotal(response.data.target_progress)
-    console.log(response.data.target_goal, response.data.target_progress)
+    try {
+      const response = await axios.get("https://crocheted-money-production.up.railway.app/api/fetch_goal_data")
+      console.log("Goal response:", response.data);
+      setGoal(response.data.target_goal)
+      setTotal(response.data.target_progress)
+    } catch (error) {
+      console.error("Goal fetch error:", error);
+    }
   }
 
   useEffect(() => {
