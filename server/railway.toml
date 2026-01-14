@@ -3,7 +3,7 @@ builder = "nixpacks"
 
 [deploy]
 startCommand = "gunicorn app:app --bind 0.0.0.0:$PORT"
-healthcheckPath = "/api/fetch_goal_data"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 10
-
+restartPolicyMaxRetries = 3

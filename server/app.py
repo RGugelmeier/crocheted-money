@@ -32,6 +32,11 @@ def create_db():
     with app.app_context():
         db.create_all()
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Railway uses this to verify the server is running"""
+    return jsonify({'status': 'healthy'}), 200
+
 @app.route('/api/fetch_stuffies', methods=['GET'])
 def fetch_stuffies():
     # Get stuffies from MySQL db
