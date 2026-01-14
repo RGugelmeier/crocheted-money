@@ -16,7 +16,11 @@ CORS(app,
      allow_headers=["Content-Type"],
      supports_credentials=True)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+# Railway provides mysql:// but SQLAlchemy needs mysql+pymysql://
+database_url = os.getenv('DATABASE_URL')
+if database_url and database_url.startswith('mysql://'):
+    database_url = database_url.replace('mysql://', 'mysql+pymysql://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 db = SQLAlchemy(app)
 
 class quick_add_list(db.Model):
