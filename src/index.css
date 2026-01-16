@@ -1,11 +1,24 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: cuteFont;
+  src: url('/fonts/SuperAdorable.ttf');
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'cuteFont';
   line-height: 1.5;
   font-weight: 400;
+  font-size: large;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #a23b5a;
+  background-image: url('/BGClouds.png');
+  background-color: #fff7d3;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,6 +26,14 @@
   -moz-osx-font-smoothing: grayscale;
 
   text-align: center;
+}
+
+.multicolour-text span:nth-child(odd) {
+  color: #ffaccf
+}
+
+.multicolour-text span:nth-child(even) {
+  color: #ffd1e5
 }
 
 a {
@@ -44,7 +65,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #ffaccf;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -64,12 +85,14 @@ button:focus-visible {
 }
 
 .numpad {
+  border-radius: 25px;
   display: grid;
   grid-template-columns: 50px 50px 50px;
-  background-color: rgba(120, 116, 168, 0.527);
+  background-color: #ffd999;
   padding: 10px;
   width: fit-content;
   margin: 0 auto;
+  
 }
 
 .numpad button {
@@ -79,9 +102,10 @@ button:focus-visible {
 }
 
 .container {
+  border-radius: 25px;
   display: grid;
   grid-template-columns: 100px 100px 100px;
-  background-color: rgba(120, 116, 168, 0.527);
+  background-color: #ffd999;
   padding: 10px;
 }
 

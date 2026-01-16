@@ -1,13 +1,24 @@
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Numpad from './Numpad'
+import './ContextMenu'
 import axios from "axios";
+import ContextMenu from './ContextMenu';
 
 function App() {
   // Hooks
-  const [show, setShow] = useState(false);
+  const contextMenuRef = useRef(null)
+  const [contextMenu, setContextMenu] = useState({
+    position: {
+      x: 0,
+      y: 0
+    },
+    toggled: false
+  })
+  const [rightClickedItem, setRightClickedItem] = useState(null)
+  const [showQuickAddModal, setShowQuickAddModal] = useState(false);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [stuffyList, setList] = useState([]);
@@ -24,6 +35,35 @@ function App() {
       setList([])
     }
   };
+
+  function handleOnContextMenu(e, rightClickItem){
+    e.preventDefault()
+
+    const contextMenuAttr = contextMenuRef.current.getBoundingClientRect()
+
+    const isLeft = e.clientX < window?.innerWidth / 2
+
+    let x
+    let y = e.clientY
+
+    if(isLeft) {
+      x = e.clientX
+    } 
+    else{
+      x = e.clientX - contextMenuAttr.width
+    }
+
+    setContextMenu({
+      position: {
+        x, 
+        y
+      },
+      toggled: true
+    })
+
+    setRightClickedItem(rightClickItem)
+    console.log(rightClickItem)
+  }
 
   const fetchGoal = async () => {
     try {
@@ -44,6 +84,30 @@ function App() {
     fetchGoal()
   }, [])
 
+
+
+  function resetContextMenu(){
+    setContextMenu({
+      position: {
+        x: 0,
+        y: 0
+      },
+      toggled: false
+    })
+  }
+  useEffect(() => {
+    function handler(e){
+      if(contextMenuRef.current){
+        if(!contextMenuRef.current.contains(e.target)){
+          resetContextMenu()
+        }
+      }
+    }
+
+    document.addEventListener('click', handler)
+    return () => document.removeEventListener('click', handler)
+  })
+
   // The 'stuffies' array converted to a list of buttons. The buttons call 'AddToTotal' when clicked.
   const listStuffies = () => {
     const handleClick = (stuffy) => {
@@ -53,7 +117,7 @@ function App() {
     return(
       <div className='container'>
         {stuffyList.map((stuffy) => (
-              <button key={stuffy.id} onClick={() => handleClick(stuffy)}>
+              <button key={stuffy.id} onClick={() => handleClick(stuffy)} onContextMenu={(e) => handleOnContextMenu(e, stuffy)}>
                 {stuffy.StuffyName}<br/>${stuffy.Price}
               </button>
         ))}
@@ -63,7 +127,6 @@ function App() {
 
   // Adds a new stuffy to the array
   async function addNewStuffy(name, price){
-    console.log("Entered")
     // Id is automatically set by the DB
     try{
     // Send a post request to the add_new_stuffies endpoint
@@ -72,10 +135,22 @@ function App() {
       //Reload the quick add list
       fetchAPI()
       //Close the modal
-      handleClose()
+      handleCloseQuickAddModal()
     }
     catch(error){
       console.error("Error submitting form: ", error);
+    }
+  }
+
+  async function deleteStuffy(id){
+    try{
+      console.log(id)
+      const response = await axios.delete('https://crocheted-money-production.up.railway.app/api/delete_stuffy', { data: { stuffyId: id } })
+      console.log(response)
+      fetchAPI()
+    }
+    catch(error){
+      console.error(`Error deleting stuffy with id: ${id}. Error: `, error)
     }
   }
 
@@ -92,17 +167,21 @@ function App() {
     }
   }
 
-  const handleShow = () => setShow(true);
-  const handleClose = () => {
-    setShow(false);
+  const handleShowQuickAddModal = () => setShowQuickAddModal(true);
+  const handleCloseQuickAddModal = () => {
+    setShowQuickAddModal(false);
     setName('');
     setPrice('');
   };
 
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   return (
     <main>
-
-      <div>
+      <div className='multicolour-text'>
         <h2>Goal</h2>
         {total} <progress value={total} max={goal}/> {goal}
       </div>
@@ -110,44 +189,67 @@ function App() {
       <div>
         <h2>Add To Goal</h2>
         <Numpad onEnter={AddToTotal}/>
-        <h3>Quick Add</h3>
-        <button onClick={handleShow}>Add New Stuffy Type</button>
+        <h2>Quick Add</h2>
+        <button onClick={handleShowQuickAddModal}>Add New Stuffy Type</button>
         {listStuffies()}
       </div>
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add New Stuffy Type</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Stuffy Name</Form.Label>
-              <Form.Control
-                type="text"
-                autoFocus
-                id='name'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Stuffy Price</Form.Label>
-              <Form.Control 
-                type="number" 
-                placeholder='0.00' 
-                id='price'
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={() => addNewStuffy(name, price)}>Submit</Button>
-          <Button onClick={handleClose}>Close</Button>
-        </Modal.Footer>
-      </Modal>
+      <ContextMenu
+        contextMenuRef={contextMenuRef}
+        isToggled={contextMenu.toggled}
+        positionX={contextMenu.position.x}
+        positionY={contextMenu.position.y}
+        buttons={[
+          {
+            text: "Edit Stuffy",
+            icon: "✏️",
+            onClick: () => alert("Edit clicked"),
+            isSpacer: false,
+          },
+          {
+            text: "Delete Stuffy",
+            icon: "🗑️",
+            onClick: () => deleteStuffy(rightClickedItem?.id),
+            isSpacer: false,
+          }
+        ]}
+      />
+
+      <div className='modal show' style={{ display: 'block', position: 'initial'}}>
+        <Modal show={showQuickAddModal} onHide={handleCloseQuickAddModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Add New Stuffy Type</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Stuffy Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  autoFocus
+                  id='name'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Stuffy Price</Form.Label>
+                <Form.Control 
+                  type="number" 
+                  placeholder='0.00' 
+                  id='price'
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={() => addNewStuffy(name, price)}>Submit</Button>
+            <Button onClick={handleCloseQuickAddModal}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
     </main>
   )
 }

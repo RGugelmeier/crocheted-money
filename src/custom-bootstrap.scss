@@ -1,0 +1,21 @@
+// Required Bootstrap core (no visual styles, just utilities)
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// Root CSS variables (needed for colors/theming)
+@import "bootstrap/scss/root";
+
+// Only the components you need - NO reboot (which would override your styles)
+@import "bootstrap/scss/transitions";  // For modal fade animation
+@import "bootstrap/scss/close";        // For modal close button
+@import "bootstrap/scss/modal";        // Modal itself
+
+// Form components (since you're using Form in the modal)
+@import "bootstrap/scss/forms";
+
+// Bootstrap button styles (uses .btn class, won't affect your plain button styles)
+@import "bootstrap/scss/buttons";

@@ -12,7 +12,7 @@ app = Flask(__name__)
 # CORS configuration for production
 CORS(app, 
      origins=["https://crocheted-money.vercel.app", "http://localhost:5173"],
-     methods=["GET", "POST", "PATCH", "OPTIONS"],
+     methods=["GET", "POST", "PATCH", "OPTIONS", "DELETE"],
      allow_headers=["Content-Type"],
      supports_credentials=True)
 
@@ -69,6 +69,30 @@ def add_new_stuffy():
         'StuffyName': new_stuffy.StuffyName,
         'Price': new_stuffy.Price
     }), 201
+
+@app.route('/api/delete_stuffy', methods=['DELETE'])
+def delete_stuffy():
+    data = request.get_json()
+    if not data or 'stuffyId' not in data:
+        return jsonify({'error': 'invalid data'}), 400
+    
+    # Query for the existing record first
+    stuffy_to_delete = db.session.get(quick_add_list, data['stuffyId'])
+    
+    if not stuffy_to_delete:
+        return jsonify({'error': 'Stuffy not found'}), 404
+    
+    # Store info for response before deleting
+    response_data = {
+        'id': stuffy_to_delete.id,
+        'StuffyName': stuffy_to_delete.StuffyName,
+        'Price': stuffy_to_delete.Price
+    }
+    
+    db.session.delete(stuffy_to_delete)
+    db.session.commit()
+
+    return jsonify(response_data), 200
 
 @app.route('/api/fetch_goal_data', methods=['GET'])
 def fetch_goal_data():
