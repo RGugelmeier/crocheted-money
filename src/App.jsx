@@ -139,7 +139,7 @@ function App() {
       handleCloseQuickAddModal()
     }
     catch(error){
-      console.error("Error submitting form: ", error);
+      console.error("Error submitting form: ", error)
     }
   }
 
@@ -147,6 +147,9 @@ function App() {
     try{
       console.log(id)
       const response = await axios.patch('https://crocheted-money-production.up.railway.app/api/edit_stuffy', {data: { stuffyId: id, new_name: newName, new_price: newPrice}})
+      console.log(response)
+      fetchAPI()
+      handleCloseEditModal()
     }
     catch(error)
     {
@@ -245,21 +248,21 @@ function App() {
                   type="text"
                   autoFocus
                   id='name'
-                  value={name}
+                  value={rightClickedItem?.StuffyName}
                   onChange={(e) => setName(e.target.value)}
                 />
                 <Form.Label>Edit Price</Form.Label>
                 <Form.Control
                   type="number"
                   id='price'
-                  value={price}
+                  value={rightClickedItem?.Price}
                   onChange={(e) => setPrice(e.target.value)}
                 />
               </Form.Group>
             </Form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => editStuffy(rightClickedItem?.id, newName=name, newPrice=price)}>Submit</Button>
+            <Button onClick={() => editStuffy(rightClickedItem?.id, name, price)}>Submit</Button>
             <Button onClick={handleCloseEditModal}>Close</Button>
           </Modal.Footer>
         </Modal>

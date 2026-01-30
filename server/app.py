@@ -106,7 +106,7 @@ def edit_stuffy():
         return jsonify({'error': 'Stuffy not found'}), 404
 
     stuffy_to_edit.StuffyName = data['new_name']
-    stuffy_to_edit.Price = data['Price']
+    stuffy_to_edit.Price = data['new_price']
 
     db.session.commit()
 
