@@ -94,6 +94,30 @@ def delete_stuffy():
 
     return jsonify(response_data), 200
 
+@app.route('/api/edit_stuffy', methods=['PATCH'])
+def edit_stuffy():
+    data = request.get_json()
+    if not data or 'stuffyId' not in data or 'new_name' not in data or 'new_price' not in data:
+        return jsonify({'error': 'Invalid data'}), 400
+
+    # Find the stuffy item with the passed id from the db
+    stuffy_to_edit = db.session.get(quick_add_list, data['stuffyId'])
+    if not stuffy_to_edit:
+        return jsonify({'error': 'Stuffy not found'}), 404
+
+    stuffy_to_edit.StuffyName = data['new_name']
+    stuffy_to_edit.Price = data['Price']
+
+    db.session.commit()
+
+    response_data = {
+        'id': stuffy_to_edit.id,
+        'StuffyName': stuffy_to_edit.StuffyName,
+        'Price': stuffy_to_edit.Price
+    }
+
+    return jsonify(response_data), 200
+
 @app.route('/api/fetch_goal_data', methods=['GET'])
 def fetch_goal_data():
     with app.app_context():

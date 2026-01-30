@@ -17,8 +17,9 @@ function App() {
     },
     toggled: false
   })
-  const [rightClickedItem, setRightClickedItem] = useState(null)
+  const [rightClickedItem, setRightClickedItem] = useState(null);
   const [showQuickAddModal, setShowQuickAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [stuffyList, setList] = useState([]);
@@ -142,9 +143,19 @@ function App() {
     }
   }
 
-  async function deleteStuffy(id){
+  async function editStuffy(id, newName, newPrice){
     try{
       console.log(id)
+      const response = await axios.patch('https://crocheted-money-production.up.railway.app/api/edit_stuffy', {data: { stuffyId: id, new_name: newName, new_price: newPrice}})
+    }
+    catch(error)
+    {
+      console.error(`Error editting stuffy with id: ${id}`)
+    }
+  } 
+
+  async function deleteStuffy(id){
+    try{
       const response = await axios.delete('https://crocheted-money-production.up.railway.app/api/delete_stuffy', { data: { stuffyId: id } })
       console.log(response)
       fetchAPI()
@@ -173,6 +184,12 @@ function App() {
     setName('');
     setPrice('');
   };
+  const handleShowEditModal = () => setShowEditModal(true);
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setName('');
+    setPrice('');
+  }
 
   const [show, setShow] = useState(false);
 
@@ -203,7 +220,7 @@ function App() {
           {
             text: "Edit Stuffy",
             icon: "✏️",
-            onClick: () => alert("Edit clicked"),
+            onClick: () => handleShowEditModal(), // TODO: I think this needs to be pased some parameters from the edit modal below.
             isSpacer: false,
           },
           {
@@ -214,6 +231,39 @@ function App() {
           }
         ]}
       />
+
+      <div className='modal show' style={{ display: 'block', position: 'initial'}}>
+        <Modal show={showEditModal} onHide={handleCloseEditModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Stuffy</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Edit Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  autoFocus
+                  id='name'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <Form.Label>Edit Price</Form.Label>
+                <Form.Control
+                  type="number"
+                  id='price'
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={() => editStuffy(rightClickedItem?.id, newName=name, newPrice=price)}>Submit</Button>
+            <Button onClick={handleCloseEditModal}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
 
       <div className='modal show' style={{ display: 'block', position: 'initial'}}>
         <Modal show={showQuickAddModal} onHide={handleCloseQuickAddModal}>
