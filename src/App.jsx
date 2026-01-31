@@ -1,5 +1,7 @@
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import { useState, useEffect, useRef } from 'react';
 import Numpad from './Numpad'
@@ -146,7 +148,7 @@ function App() {
   async function editStuffy(id, newName, newPrice){
     try{
       console.log(id)
-      const response = await axios.patch('https://crocheted-money-production.up.railway.app/api/edit_stuffy', {data: { stuffyId: id, new_name: newName, new_price: newPrice}})
+      const response = await axios.patch('https://crocheted-money-production.up.railway.app/api/edit_stuffy', { stuffyId: id, new_name: newName, new_price: newPrice})
       console.log(response)
       fetchAPI()
       handleCloseEditModal()
@@ -181,13 +183,35 @@ function App() {
     }
   }
 
+  async function ManuallyEditGoal(newGoal){
+    if(newGoal == null)
+    {
+      newGoal = 0;
+    }
+    if(confirm(`Would you like to set your total to ${newGoal}?`))
+    {
+      try{
+        setTotal(newGoal)
+        const response = await axios.patch('https://crocheted-money-production.up.railway.app/api/set_target_progress', {target_progress: newGoal})
+        console.log(response)
+      }
+      catch(error){
+        console.error("Error modifying goal progress", error)
+      }
+    }
+  }
+
   const handleShowQuickAddModal = () => setShowQuickAddModal(true);
   const handleCloseQuickAddModal = () => {
     setShowQuickAddModal(false);
     setName('');
     setPrice('');
   };
-  const handleShowEditModal = () => setShowEditModal(true);
+  const handleShowEditModal = () => {
+    setName(rightClickedItem?.StuffyName || '');
+    setPrice(rightClickedItem?.Price || '');
+    setShowEditModal(true);
+  };
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setName('');
@@ -207,6 +231,18 @@ function App() {
       </div>
 
       <div>
+        <Form>
+          <Form.Label>
+            Manually Enter Total
+          </Form.Label>
+          <Form.Control
+            type="number"
+            id="manualTotal"
+            defaultValue={0.00}
+            min={0}
+          />
+        </Form>
+        <button onClick={() => ManuallyEditGoal(parseFloat(document.getElementById('manualTotal').value))}>Submit</button>
         <h2>Add To Goal</h2>
         <Numpad onEnter={AddToTotal}/>
         <h2>Quick Add</h2>
@@ -248,14 +284,14 @@ function App() {
                   type="text"
                   autoFocus
                   id='name'
-                  value={rightClickedItem?.StuffyName}
+                  value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
                 <Form.Label>Edit Price</Form.Label>
                 <Form.Control
                   type="number"
                   id='price'
-                  value={rightClickedItem?.Price}
+                  value={price}
                   onChange={(e) => setPrice(e.target.value)}
                 />
               </Form.Group>

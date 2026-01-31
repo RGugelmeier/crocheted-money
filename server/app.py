@@ -9,9 +9,18 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# CORS configuration for production
+# Determine environment (default to production for safety)
+ENV = os.getenv('FLASK_ENV', 'production').lower()
+app.config['DEBUG'] = ENV == 'development'
+
+# CORS configuration - different origins for dev and production
+if ENV == 'development':
+    cors_origins = ["http://localhost:5173", "http://localhost:3000"]
+else:
+    cors_origins = ["https://crocheted-money.vercel.app"]
+
 CORS(app, 
-     origins=["https://crocheted-money.vercel.app", "http://localhost:5173"],
+     origins=cors_origins,
      methods=["GET", "POST", "PATCH", "OPTIONS", "DELETE"],
      allow_headers=["Content-Type"],
      supports_credentials=True)
@@ -38,7 +47,6 @@ def create_db():
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Railway uses this to verify the server is running"""
     return jsonify({'status': 'healthy'}), 200
 
 @app.route('/api/fetch_stuffies', methods=['GET'])
@@ -156,4 +164,4 @@ def set_target_progress():
 if __name__ == '__main__':
     create_db()
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=(ENV == 'development'))
