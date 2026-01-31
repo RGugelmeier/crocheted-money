@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String, VARCHAR, Float, select
+from sqlalchemy import Integer, VARCHAR, Float
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
@@ -8,16 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-
-# Determine environment (default to production for safety)
-ENV = os.getenv('FLASK_ENV', 'production').lower()
-app.config['DEBUG'] = ENV == 'development'
-
-# CORS configuration - different origins for dev and production
-if ENV == 'development':
-    cors_origins = ["http://localhost:5173", "http://localhost:3000"]
-else:
-    cors_origins = ["https://crocheted-money.vercel.app"]
+cors_origins = ["https://crocheted-money.vercel.app"]
 
 CORS(app, 
      origins=cors_origins,
@@ -163,5 +154,4 @@ def set_target_progress():
 
 if __name__ == '__main__':
     create_db()
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=(ENV == 'development'))
+    app.run()

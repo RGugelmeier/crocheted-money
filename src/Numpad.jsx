@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import axios from "axios";
 
 function Numpad({ onEnter }){
     const [value, setValue] = useState("")

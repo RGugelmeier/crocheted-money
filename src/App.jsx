@@ -1,7 +1,5 @@
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import { useState, useEffect, useRef } from 'react';
 import Numpad from './Numpad'
@@ -31,7 +29,6 @@ function App() {
   const fetchAPI = async () => {
     try {
       const response = await axios.get("https://crocheted-money-production.up.railway.app/api/fetch_stuffies");
-      console.log("API response:", response.data);
       setList(response.data || [])
     } catch (error) {
       console.error("Fetch error:", error);
@@ -65,13 +62,11 @@ function App() {
     })
 
     setRightClickedItem(rightClickItem)
-    console.log(rightClickItem)
   }
 
   const fetchGoal = async () => {
     try {
       const response = await axios.get("https://crocheted-money-production.up.railway.app/api/fetch_goal_data")
-      console.log("Goal response:", response.data);
       setGoal(response.data.target_goal)
       setTotal(response.data.target_progress)
     } catch (error) {
@@ -134,7 +129,6 @@ function App() {
     try{
     // Send a post request to the add_new_stuffies endpoint
       const response = await axios.post('https://crocheted-money-production.up.railway.app/api/add_new_stuffy', {StuffyName: name, Price: parseFloat(price)});
-      console.log(response)
       //Reload the quick add list
       fetchAPI()
       //Close the modal
@@ -147,9 +141,7 @@ function App() {
 
   async function editStuffy(id, newName, newPrice){
     try{
-      console.log(id)
       const response = await axios.patch('https://crocheted-money-production.up.railway.app/api/edit_stuffy', { stuffyId: id, new_name: newName, new_price: newPrice})
-      console.log(response)
       fetchAPI()
       handleCloseEditModal()
     }
@@ -162,7 +154,6 @@ function App() {
   async function deleteStuffy(id){
     try{
       const response = await axios.delete('https://crocheted-money-production.up.railway.app/api/delete_stuffy', { data: { stuffyId: id } })
-      console.log(response)
       fetchAPI()
     }
     catch(error){
@@ -176,7 +167,6 @@ function App() {
       const newTotal = total + amount
       setTotal(newTotal)
       const response = await axios.patch('https://crocheted-money-production.up.railway.app/api/set_target_progress', {target_progress: newTotal})
-      console.log(response)
     }
     catch(error){
       console.error("Error modifying goal progress: ", error)
@@ -184,16 +174,20 @@ function App() {
   }
 
   async function ManuallyEditGoal(newGoal){
-    if(newGoal == null)
+    if(isNaN(newGoal))
     {
       newGoal = 0;
+    }
+    else if(newGoal < 0)
+    {
+      alert("Value must be greater than or equal to 0")
+      return;
     }
     if(confirm(`Would you like to set your total to ${newGoal}?`))
     {
       try{
         setTotal(newGoal)
         const response = await axios.patch('https://crocheted-money-production.up.railway.app/api/set_target_progress', {target_progress: newGoal})
-        console.log(response)
       }
       catch(error){
         console.error("Error modifying goal progress", error)
@@ -225,7 +219,7 @@ function App() {
 
   return (
     <main>
-      <div className='multicolour-text'>
+      <div>
         <h2>Goal</h2>
         {total} <progress value={total} max={goal}/> {goal}
       </div>
@@ -259,7 +253,7 @@ function App() {
           {
             text: "Edit Stuffy",
             icon: "✏️",
-            onClick: () => handleShowEditModal(), // TODO: I think this needs to be pased some parameters from the edit modal below.
+            onClick: () => handleShowEditModal(),
             isSpacer: false,
           },
           {
