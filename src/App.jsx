@@ -28,7 +28,7 @@ function App() {
 
   const fetchAPI = async () => {
     try {
-      const response = await axios.get("https://crocheted-money-api.onrender.com/api/fetch_stuffies");
+      const response = await axios.get("https://crocheted-money-backend.onrender.com/api/fetch_stuffies");
       setList(response.data || [])
     } catch (error) {
       console.error("Fetch error:", error);
@@ -66,7 +66,7 @@ function App() {
 
   const fetchGoal = async () => {
     try {
-      const response = await axios.get("https://crocheted-money-api.onrender.com/api/fetch_goal_data")
+      const response = await axios.get("https://crocheted-money-backend.onrender.com/api/fetch_goal_data")
       setGoal(response.data.target_goal)
       setTotal(response.data.target_progress)
     } catch (error) {
@@ -128,7 +128,7 @@ function App() {
     // Id is automatically set by the DB
     try{
     // Send a post request to the add_new_stuffies endpoint
-      const response = await axios.post('https://crocheted-money-api.onrender.com/api/add_new_stuffy', {StuffyName: name, Price: parseFloat(price)});
+      const response = await axios.post('https://crocheted-money-backend.onrender.com/api/add_new_stuffy', {StuffyName: name, Price: parseFloat(price)});
       //Reload the quick add list
       fetchAPI()
       //Close the modal
@@ -141,7 +141,7 @@ function App() {
 
   async function editStuffy(id, newName, newPrice){
     try{
-      const response = await axios.patch('https://crocheted-money-api.onrender.com/api/edit_stuffy', { stuffyId: id, new_name: newName, new_price: newPrice})
+      const response = await axios.patch('https://crocheted-money-backend.onrender.com/api/edit_stuffy', { stuffyId: id, new_name: newName, new_price: newPrice})
       fetchAPI()
       handleCloseEditModal()
     }
@@ -153,7 +153,7 @@ function App() {
 
   async function deleteStuffy(id){
     try{
-      const response = await axios.delete('https://crocheted-money-api.onrender.com/api/delete_stuffy', { data: { stuffyId: id } })
+      const response = await axios.delete('https://crocheted-money-backend.onrender.com/api/delete_stuffy', { data: { stuffyId: id } })
       fetchAPI()
     }
     catch(error){
@@ -166,7 +166,7 @@ function App() {
     try{
       const newTotal = total + amount
       setTotal(newTotal)
-      const response = await axios.patch('https://crocheted-money-api.onrender.com/api/set_target_progress', {target_progress: newTotal})
+      const response = await axios.patch('https://crocheted-money-backend.onrender.com/api/set_target_progress', {target_progress: newTotal})
     }
     catch(error){
       console.error("Error modifying goal progress: ", error)
@@ -187,7 +187,7 @@ function App() {
     {
       try{
         setTotal(newGoal)
-        const response = await axios.patch('https://crocheted-money-api.onrender.com/api/set_target_progress', {target_progress: newGoal})
+        const response = await axios.patch('https://crocheted-money-backend.onrender.com/api/set_target_progress', {target_progress: newGoal})
       }
       catch(error){
         console.error("Error modifying goal progress", error)
