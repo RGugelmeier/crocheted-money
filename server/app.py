@@ -20,7 +20,20 @@ CORS(app,
 database_url = os.getenv('DATABASE_URL')
 if database_url and database_url.startswith('mysql://'):
     database_url = database_url.replace('mysql://', 'mysql+pymysql://', 1)
+
+# Remove SSL query parameters from URL since we'll pass them via connect_args
+if '?ssl=' in database_url:
+    database_url = database_url.split('?')[0]
+
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+
+# TiDB Cloud requires SSL connections
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'connect_args': {
+        'ssl': {'ssl': True},
+    }
+}
+
 db = SQLAlchemy(app)
 
 class quick_add_list(db.Model):
