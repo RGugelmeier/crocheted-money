@@ -11,4 +11,4 @@ services:
     envVars:
       - key: DATABASE_URL
         scope: run
-        value: mysql://2RurtFwhAV4RWf5.root:Yc6ZEp84YHzJdoPG@gateway01.us-east-1.prod.aws.tidbcloud.com:4000/test
+        value: mysql+pymysql://2RurtFwhAV4RWf5.root:Yc6ZEp84YHzJdoPG@gateway01.us-east-1.prod.aws.tidbcloud.com:4000/test?ssl=true
